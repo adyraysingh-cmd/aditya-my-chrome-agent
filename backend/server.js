@@ -4,7 +4,8 @@ import cors from 'cors';
 import OpenAI from 'openai';
 
 const app = express();
-app.use(cors({ origin: true }));
+app.use(cors({ origin: true, methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type'] }));
+app.options('*', cors({ origin: true }));
 app.use(express.json({ limit: '2mb' }));
 
 const port = Number(process.env.PORT || 8787);
@@ -90,9 +91,9 @@ app.post('/next', async (req, res) => {
 
     res.json({ action, responseId: response.id });
   } catch (error) {
-    console.error(error?.message || error);
+    console.error(error?.stack || error?.message || error);
     res.status(500).json({ error: error?.message || 'Agent error' });
   }
 });
 
-app.listen(port, () => console.log(`Chrome Autopilot backend listening on port ${port}`));
+app.listen(port, '127.0.0.1', () => console.log(`Chrome Autopilot backend listening on http://127.0.0.1:${port}`));
