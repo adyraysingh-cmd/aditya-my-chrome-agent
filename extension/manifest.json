@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "OpenAI Chrome Autopilot",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Claude-style persistent chat with an autonomous browser agent powered by OpenAI.",
   "permissions": ["activeTab", "tabs", "storage", "scripting", "sidePanel"],
-  "host_permissions": ["http://127.0.0.1:8787/*", "http://localhost:8787/*"],
+  "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "service-worker.js", "type": "module" },
   "action": { "default_title": "OpenAI Autopilot" },
   "side_panel": { "default_path": "sidepanel.html" },
