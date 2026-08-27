@@ -5,7 +5,6 @@ import OpenAI from 'openai';
 
 const app = express();
 app.use(cors({ origin: true, methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type'] }));
-app.options('*', cors({ origin: true }));
 app.use(express.json({ limit: '2mb' }));
 
 const port = Number(process.env.PORT || 8787);
