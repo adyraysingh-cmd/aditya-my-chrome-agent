@@ -13,9 +13,9 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM = `You are Chrome Autopilot, an autonomous browser task agent.
 
-Your job is to convert a user's goal into ONE concrete browser action at a time. You receive a compact DOM snapshot from the Chrome extension. Choose the next action that makes measurable progress. Do not invent element ids. If an action fails, adapt using the new snapshot.
+Convert the user's goal into ONE concrete browser action at a time. You receive a compact DOM snapshot and recent conversation context. Choose the next action that makes measurable progress. Do not invent element ids. If an action fails, adapt using the new snapshot.
 
-Return valid json only with this schema:
+Return valid json only. The JSON object must match this schema:
 {"action":"click|type|scroll|navigate|wait|finish","elementId":"string or null","text":"string or null","url":"string or null","amount":"number or null","reason":"short string","result":"string or null"}
 
 Rules:
@@ -28,6 +28,7 @@ Rules:
 - Never claim success before the browser result confirms it.
 - Prefer visible, semantically relevant controls.
 - Work autonomously; do not ask the user for routine confirmation.
+- Use conversation context to understand follow-up requests and references such as 'that page', 'same thing', or 'go back'.
 - If the requested task cannot be completed from the browser context, finish with a clear explanation.`;
 
 function normalizeSnapshot(snapshot = {}) {
@@ -39,6 +40,14 @@ function normalizeSnapshot(snapshot = {}) {
   };
 }
 
+function normalizeConversation(conversation = []) {
+  if (!Array.isArray(conversation)) return [];
+  return conversation.slice(-20).map(item => ({
+    role: item?.role === 'assistant' ? 'assistant' : 'user',
+    content: String(item?.content || '').slice(0, 3000)
+  }));
+}
+
 app.get('/health', (_req, res) => res.json({ ok: true, model }));
 
 app.post('/next', async (req, res) => {
@@ -47,13 +56,14 @@ app.post('/next', async (req, res) => {
       return res.status(500).json({ error: 'OPENAI_API_KEY is not configured on the backend.' });
     }
 
-    const { goal, snapshot, history = [], step = 0 } = req.body || {};
+    const { goal, snapshot, history = [], conversation = [], step = 0 } = req.body || {};
     if (!goal) return res.status(400).json({ error: 'goal is required' });
 
     const safeHistory = Array.isArray(history) ? history.slice(-12) : [];
+    const safeConversation = normalizeConversation(conversation);
     const input = [{
       role: 'user',
-      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}\n\nRespond with valid json only. Return a json object matching the action schema from the system instructions.`
+      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}\n\nCONVERSATION MEMORY (recent messages):\n${JSON.stringify(safeConversation)}\n\nRespond with valid json only. The response must be a JSON object matching the action schema from the system instructions.`
     }];
 
     const response = await client.responses.create({
