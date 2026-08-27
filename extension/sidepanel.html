@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OpenAI Autopilot</title>
+<style>
+body{font:14px system-ui,sans-serif;margin:0;background:#111;color:#eee}main{padding:14px}h1{font-size:18px;margin:0 0 10px}textarea{width:100%;box-sizing:border-box;min-height:110px;background:#1b1b1b;color:#fff;border:1px solid #444;border-radius:10px;padding:10px;resize:vertical}button{width:100%;margin-top:10px;padding:10px;border:0;border-radius:10px;background:#fff;color:#111;font-weight:700;cursor:pointer}button:disabled{opacity:.5}.status{margin-top:12px;padding:10px;background:#1b1b1b;border-radius:10px;white-space:pre-wrap}.log{margin-top:10px;font-size:12px;color:#bbb;max-height:300px;overflow:auto}.row{display:flex;gap:8px}.row button{width:auto;flex:1}.hint{font-size:11px;color:#888;margin-top:8px}
+</style>
+</head>
+<body><main>
+<h1>OpenAI Chrome Autopilot</h1>
+<textarea id="goal" placeholder="Tell the agent what to do...\nExample: Open example.com and find the contact page."></textarea>
+<div class="row"><button id="run">Run Autopilot</button><button id="stop" disabled>Stop</button></div>
+<div id="status" class="status">Idle</div>
+<div id="log" class="log"></div>
+<div class="hint">Backend: configure BACKEND_URL in sidepanel.js for your hosted API.</div>
+</main><script src="sidepanel.js"></script></body></html>
