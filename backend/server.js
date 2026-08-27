@@ -15,7 +15,7 @@ const SYSTEM = `You are Chrome Autopilot, an autonomous browser task agent.
 
 Your job is to convert a user's goal into ONE concrete browser action at a time. You receive a compact DOM snapshot from the Chrome extension. Choose the next action that makes measurable progress. Do not invent element ids. If an action fails, adapt using the new snapshot.
 
-Return valid JSON only with this schema:
+Return valid json only with this schema:
 {"action":"click|type|scroll|navigate|wait|finish","elementId":"string or null","text":"string or null","url":"string or null","amount":"number or null","reason":"short string","result":"string or null"}
 
 Rules:
@@ -53,7 +53,7 @@ app.post('/next', async (req, res) => {
     const safeHistory = Array.isArray(history) ? history.slice(-12) : [];
     const input = [{
       role: 'user',
-      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}\n\nRespond with valid JSON only. The response must be a JSON object matching the action schema from the system instructions.`
+      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}\n\nRespond with valid json only. Return a json object matching the action schema from the system instructions.`
     }];
 
     const response = await client.responses.create({
