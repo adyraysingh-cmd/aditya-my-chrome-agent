@@ -3,16 +3,25 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>OpenAI Autopilot</title>
+<title>OpenAI Chrome Autopilot</title>
 <style>
-body{font:14px system-ui,sans-serif;margin:0;background:#111;color:#eee}main{padding:14px}h1{font-size:18px;margin:0 0 10px}textarea{width:100%;box-sizing:border-box;min-height:110px;background:#1b1b1b;color:#fff;border:1px solid #444;border-radius:10px;padding:10px;resize:vertical}button{width:100%;margin-top:10px;padding:10px;border:0;border-radius:10px;background:#fff;color:#111;font-weight:700;cursor:pointer}button:disabled{opacity:.5}.status{margin-top:12px;padding:10px;background:#1b1b1b;border-radius:10px;white-space:pre-wrap}.log{margin-top:10px;font-size:12px;color:#bbb;max-height:300px;overflow:auto}.row{display:flex;gap:8px}.row button{width:auto;flex:1}.hint{font-size:11px;color:#888;margin-top:8px}
+*{box-sizing:border-box}body{margin:0;background:#111;color:#eee;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;height:100vh;overflow:hidden}.app{height:100vh;display:flex;flex-direction:column}.top{height:58px;border-bottom:1px solid #292929;display:flex;align-items:center;padding:0 12px;gap:10px;background:#151515}.brand{font-weight:700;flex:1}.brand small{display:block;color:#888;font-weight:400;font-size:10px;margin-top:2px}.icon{border:0;background:transparent;color:#aaa;font-size:20px;width:34px;height:34px;border-radius:8px;cursor:pointer}.icon:hover{background:#242424;color:#fff}.layout{flex:1;display:flex;min-height:0}.history{width:190px;border-right:1px solid #292929;background:#151515;padding:10px;display:flex;flex-direction:column;gap:8px}.new{background:#eee;color:#111;border:0;border-radius:9px;padding:9px;font-weight:700;cursor:pointer}.list{overflow:auto;display:flex;flex-direction:column;gap:3px}.chat-item{padding:9px;border-radius:8px;color:#aaa;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chat-item:hover,.chat-item.active{background:#242424;color:#fff}.main{flex:1;display:flex;flex-direction:column;min-width:0}.messages{flex:1;overflow:auto;padding:18px 14px 8px}.empty{text-align:center;color:#777;margin-top:25vh}.empty strong{display:block;color:#ddd;font-size:20px;margin-bottom:7px}.msg{display:flex;margin:0 0 14px;gap:8px}.msg.user{justify-content:flex-end}.bubble{max-width:88%;padding:10px 12px;border-radius:14px;white-space:pre-wrap;line-height:1.45}.user .bubble{background:#2b2b2b;color:#fff}.assistant .bubble{background:transparent;color:#ddd;padding-left:0}.meta{font-size:10px;color:#666;margin-top:4px}.composer{padding:10px 12px 12px;border-top:1px solid #292929;background:#151515}.box{background:#1d1d1d;border:1px solid #3a3a3a;border-radius:14px;padding:9px}.box:focus-within{border-color:#666}.input{width:100%;min-height:48px;max-height:150px;resize:none;border:0;outline:0;background:transparent;color:#fff;font:14px inherit}.actions{display:flex;align-items:center;gap:8px;margin-top:6px}.run{margin-left:auto;border:0;border-radius:9px;background:#eee;color:#111;padding:8px 13px;font-weight:700;cursor:pointer}.run:disabled{opacity:.5}.stop{border:1px solid #444;background:#222;color:#bbb;border-radius:9px;padding:8px 11px;cursor:pointer}.status{font-size:10px;color:#777;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.log{font-size:10px;color:#666;max-height:90px;overflow:auto;margin-top:4px}.hidden{display:none!important}@media(max-width:600px){.history{width:165px}.bubble{max-width:94%}}
 </style>
 </head>
-<body><main>
-<h1>OpenAI Chrome Autopilot</h1>
-<textarea id="goal" placeholder="Tell the agent what to do...\nExample: Open example.com and find the contact page."></textarea>
-<div class="row"><button id="run">Run Autopilot</button><button id="stop" disabled>Stop</button></div>
-<div id="status" class="status">Idle</div>
-<div id="log" class="log"></div>
-<div class="hint">Backend: configure BACKEND_URL in sidepanel.js for your hosted API.</div>
-</main><script src="sidepanel.js"></script></body></html>
+<body>
+<div class="app">
+  <header class="top"><button class="icon" id="historyToggle" title="Chats">☰</button><div class="brand">OpenAI Chrome Autopilot<small>Browser agent • local memory</small></div><button class="icon" id="newTop" title="New chat">＋</button></header>
+  <div class="layout">
+    <aside class="history" id="historyPanel"><button class="new" id="newChat">＋ New chat</button><div class="list" id="chatList"></div></aside>
+    <section class="main">
+      <div class="messages" id="messages"><div class="empty" id="empty"><strong>What can I do for you?</strong>Give me a browser task and I’ll work through it.</div></div>
+      <div class="composer">
+        <div class="box"><textarea class="input" id="goal" placeholder="Message Autopilot…" rows="2"></textarea><div class="actions"><div class="status" id="status">Ready</div><button class="stop" id="stop" disabled>Stop</button><button class="run" id="run">Run ↵</button></div></div>
+        <div class="log" id="log"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="sidepanel.js"></script>
+</body>
+</html>
