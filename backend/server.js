@@ -11,7 +11,24 @@ const port = Number(process.env.PORT || 8787);
 const model = process.env.OPENAI_MODEL || 'gpt-5.5';
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const SYSTEM = `You are Chrome Autopilot, an autonomous browser task agent.\n\nYour job is to convert a user's goal into ONE concrete browser action at a time. You receive a compact DOM snapshot from the Chrome extension. Choose the next action that makes measurable progress. Do not invent element ids. If an action fails, adapt using the new snapshot.\n\nReturn strict JSON only with this schema:\n{"action":"click|type|scroll|navigate|wait|finish","elementId":"string or null","text":"string or null","url":"string or null","amount":"number or null","reason":"short string","result":"string or null"}\n\nRules:\n- click: use an elementId from the snapshot.\n- type: use elementId and text.\n- navigate: use a fully-qualified URL.\n- scroll: amount is pixels; positive means down, negative up.\n- wait: amount is milliseconds, max 5000.\n- finish: result briefly states what was accomplished.\n- Never claim success before the browser result confirms it.\n- Prefer visible, semantically relevant controls.\n- Work autonomously; do not ask the user for routine confirmation.\n- If the requested task cannot be completed from the browser context, finish with a clear explanation.`;
+const SYSTEM = `You are Chrome Autopilot, an autonomous browser task agent.
+
+Your job is to convert a user's goal into ONE concrete browser action at a time. You receive a compact DOM snapshot from the Chrome extension. Choose the next action that makes measurable progress. Do not invent element ids. If an action fails, adapt using the new snapshot.
+
+Return valid JSON only with this schema:
+{"action":"click|type|scroll|navigate|wait|finish","elementId":"string or null","text":"string or null","url":"string or null","amount":"number or null","reason":"short string","result":"string or null"}
+
+Rules:
+- click: use an elementId from the snapshot.
+- type: use elementId and text.
+- navigate: use a fully-qualified URL.
+- scroll: amount is pixels; positive means down, negative up.
+- wait: amount is milliseconds, max 5000.
+- finish: result briefly states what was accomplished.
+- Never claim success before the browser result confirms it.
+- Prefer visible, semantically relevant controls.
+- Work autonomously; do not ask the user for routine confirmation.
+- If the requested task cannot be completed from the browser context, finish with a clear explanation.`;
 
 function normalizeSnapshot(snapshot = {}) {
   return {
@@ -36,7 +53,7 @@ app.post('/next', async (req, res) => {
     const safeHistory = Array.isArray(history) ? history.slice(-12) : [];
     const input = [{
       role: 'user',
-      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}`
+      content: `USER GOAL:\n${String(goal).slice(0, 5000)}\n\nCURRENT STEP: ${step}\n\nPAGE SNAPSHOT:\n${JSON.stringify(normalizeSnapshot(snapshot))}\n\nRECENT ACTION RESULTS:\n${JSON.stringify(safeHistory)}\n\nRespond with valid JSON only. The response must be a JSON object matching the action schema from the system instructions.`
     }];
 
     const response = await client.responses.create({
